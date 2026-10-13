@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Grand Horizon Hotel</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+        h1 { color: #173b35; }
+        .logout button, .action button {
+            border: 0;
+            border-radius: 5px;
+            padding: 10px 14px;
+            cursor: pointer;
+            color: white;
+        }
+        .logout button { background: #173b35; }
+        .confirm { background: #218838; }
+        .cancel { background: #c82333; }
+        .message { color: #176b35; }
+        .error { color: #b00020; }
+        .table-wrap {
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 3px 15px #0000000d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+        th, td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        th { background: #173b35; color: white; }
+        .status { font-weight: bold; }
+        .actions { display: flex; gap: 7px; }
+        .actions form { margin: 0; }
+        .empty { padding: 25px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1>Grand Horizon Hotel</h1>
+            <p>Admin Booking Dashboard</p>
+        </div>
+        <form class="logout" th:action="@{/logout}" method="post">
+            <button type="submit">Log Out</button>
+        </form>
+    </header>
+
+    <p class="message" th:if="${message}" th:text="${message}"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Room</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Guests</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="booking : ${bookings}">
+                <td th:text="${booking.id}"></td>
+                <td th:text="${booking.name}"></td>
+                <td th:text="${booking.email}"></td>
+                <td th:text="${booking.room}"></td>
+                <td th:text="${booking.checkin}"></td>
+                <td th:text="${booking.checkout}"></td>
+                <td th:text="${booking.guests}"></td>
+                <td class="status" th:text="${booking.status}"></td>
+                <td>
+                    <div class="actions">
+                        <form th:if="${booking.status == 'PENDING'}"
+                              th:action="@{/admin/bookings/{id}/confirm(id=${booking.id})}"
+                              method="post">
+                            <button class="confirm" type="submit">Confirm</button>
+                        </form>
+                        <form th:if="${booking.status != 'CANCELLED'}"
+                              th:action="@{/admin/bookings/{id}/cancel(id=${booking.id})}"
+                              method="post">
+                            <button class="cancel" type="submit">Cancel</button>
+                        </form>
+                        <span th:if="${booking.status == 'CANCELLED'}">No actions</span>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(bookings)}">
+                <td colspan="9" class="empty">No bookings found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
+
